@@ -16,7 +16,7 @@ module.exports = {
 
         const {email} = req.query;
 
-        const user = await client.query(` SELECT e.nome_escola, r.nome_resp, u.cod_rfid, p.descricao, u.cod_usuario, u.cpf, u.nome, u.turma, u.endereco, u.senha, u.email
+        const user = await client.query(` SELECT e.nome_escola, r.nome_resp, u.cod_rfid, p.descricao, u.cod_usuario, u.cpf, u.nome, u.turma, u.endereco, u.senha, u.email, u.niv_permissao
                                             FROM tb_usuario u
                                             INNER JOIN tb_escola e ON u.cod_escola = e.cod_escola
                                             INNER JOIN tb_responsavel r ON u.cod_resp = r.cod_resp
@@ -36,6 +36,7 @@ module.exports = {
         const client = await db.connect();
 
         const{email} = req.query;
+        //console.log(email);
 
         const situation = await client.query(`SELECT checagem_escola, checagem_sala, data_ponto, hora_ponto 
                                               FROM tb_checagem as checagem 
@@ -46,6 +47,7 @@ module.exports = {
         if (situation[0].length == 0)
             return res.send({});
         
+        //console.log(situation[0]);
         return res.send(situation[0]);
     }
 }
