@@ -32,6 +32,8 @@ app.get('/resps', respRoutes.getResp);
 
 app.get('/resp', respRoutes.getRespByEmail);
 
+app.get('/respUser', respRoutes.getUserByResp);
+
 //ADM
 app.get('/adms', admRoutes.getADM);
 

@@ -24,7 +24,24 @@ module.exports = {
         if (resp[0].length == 0)
             return res.send({});
 
-        // const userData = user.rows[0];
+        return res.send(resp[0]);
+    },
+    
+    async getUserByResp(req, res) {
+        const db = require("../db");
+
+        const client = await db.connect();
+
+        const {email} = req.query;
+
+        const resp = await client.query(`SELECT u.cpf, u.nome, u.turma, u.endereco, u.email
+                                         FROM tb_responsavel r
+                                          INNER JOIN tb_usuario u ON u.cod_usuario = r.cod_usuario
+                                         WHERE r.email_resp = "${email}"`);
+        
+        if (resp[0].length == 0)
+            return res.send({});
+
         return res.send(resp[0]);
     }
 }

@@ -26,7 +26,6 @@ module.exports = {
         if (user[0].length == 0)
             return res.send({});
 
-        // const userData = user.rows[0];
         return res.send(user[0]);
     },
 
@@ -36,18 +35,16 @@ module.exports = {
         const client = await db.connect();
 
         const{email} = req.query;
-        //console.log(email);
 
-        const situation = await client.query(`SELECT checagem_escola, checagem_sala, data_ponto, hora_ponto 
+        const situation = await client.query(`SELECT IF(checagem_escola = 1 && checagem_sala = 1, 'Presença', 'Falta') AS situacao, data_ponto, hora_ponto
                                               FROM tb_checagem as checagem 
-                                               RIGHT JOIN tb_usuario as usuario on checagem.cod_rfid = usuario.cod_rfid 
-                                              WHERE usuario.email = "${email}" 
-                                              ORDER BY checagem.hora_ponto DESC`);
+                                                RIGHT JOIN tb_usuario as usuario on checagem.cod_rfid = usuario.cod_rfid 
+                                              WHERE usuario.email = "${email}" AND checagem_escola = 0 AND checagem_sala = 0 OR usuario.email = "gabriel@gmail.com" AND checagem_escola = 1 AND checagem_sala = 1
+                                              ORDER BY checagem.data_ponto DESC, checagem.hora_ponto`);
 
         if (situation[0].length == 0)
             return res.send({});
         
-        //console.log(situation[0]);
         return res.send(situation[0]);
     }
 }
