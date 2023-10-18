@@ -36,11 +36,32 @@ module.exports = {
 
         const{email} = req.query;
 
-        const situation = await client.query(`SELECT IF(checagem_escola = 1 && checagem_sala = 1, 'Presença', 'Falta') AS situacao, data_ponto, hora_ponto
-                                              FROM tb_checagem as checagem 
-                                                RIGHT JOIN tb_usuario as usuario on checagem.cod_rfid = usuario.cod_rfid 
-                                              WHERE usuario.email = "${email}" AND checagem_escola = 0 AND checagem_sala = 0 OR usuario.email = "gabriel@gmail.com" AND checagem_escola = 1 AND checagem_sala = 1
-                                              ORDER BY checagem.data_ponto DESC, checagem.hora_ponto`);
+        const situation = await client.query(`SELECT MAX(IF(checagem_escola = 1 AND checagem_sala = 1, 'Presença', 'Falta')) AS situacao, data_ponto, MAX(hora_ponto) AS hora_ponto
+                                                FROM tb_checagem AS checagem 
+                                                RIGHT JOIN tb_usuario AS usuario ON checagem.cod_rfid = usuario.cod_rfid 
+                                                WHERE usuario.email = '${email}'  AND (checagem_escola = 0 AND checagem_sala = 0) OR (checagem_escola = 1 AND checagem_sala = 0) OR (checagem_escola = 1 AND checagem_sala = 1)
+                                                GROUP BY data_ponto
+                                                ORDER BY data_ponto DESC, hora_ponto DESC`);
+
+        if (situation[0].length == 0)
+            return res.send({});
+        
+        return res.send(situation[0]);
+    },
+
+    async getHour(req, res) {
+        const db = require("../db");
+
+        const client = await db.connect();
+
+        const{email} = req.query;
+
+        const situation = await client.query(`SELECT DISTINCT data_ponto, MIN(hora_ponto) AS menor_hora_ponto, MAX(hora_ponto) AS maior_hora_ponto
+                                                FROM tb_checagem AS checagem 
+                                                RIGHT JOIN tb_usuario AS usuario ON checagem.cod_rfid = usuario.cod_rfid 
+                                                WHERE usuario.email = '${email}' 
+                                                GROUP BY data_ponto
+                                                ORDER BY data_ponto DESC, maior_hora_ponto DESC;`);
 
         if (situation[0].length == 0)
             return res.send({});

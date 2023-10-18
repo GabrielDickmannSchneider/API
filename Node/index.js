@@ -27,6 +27,8 @@ app.get('/user', userRoutes.getUserByEmail);
 
 app.get('/situation', userRoutes.getSituation);
 
+app.get('/hour', userRoutes.getHour);
+
 //Resp
 app.get('/resps', respRoutes.getResp);
 
@@ -38,6 +40,8 @@ app.get('/respUser', respRoutes.getUserByResp);
 app.get('/adms', admRoutes.getADM);
 
 app.get('/adm', admRoutes.getAdmByEmail);
+
+app.post('/insert', admRoutes.insert);
 
 app.listen(port, function() {
     console.log("API iniciando na porta " + port);
